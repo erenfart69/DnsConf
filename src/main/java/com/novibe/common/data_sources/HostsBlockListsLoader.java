@@ -23,7 +23,15 @@ public class HostsBlockListsLoader extends ListLoader<String> {
 
     @Override
     protected String toObject(HostsLine line) {
-        return line.domain();
+        String domain = line.domain();
+
+        // Cloudflare Gateway Lists do not accept wildcard domains (*.example.com).
+        // Convert them to the base domain (example.com).
+        if (domain.startsWith("*.")) {
+            return domain.substring(2);
+        }
+
+        return domain;
     }
 
     static boolean isBlockIp(String ip) {
@@ -42,5 +50,4 @@ public class HostsBlockListsLoader extends ListLoader<String> {
         }
         return false;
     }
-
 }
